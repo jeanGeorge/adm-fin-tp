@@ -14,6 +14,7 @@ import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
 import MenuItem from "@material-ui/core/MenuItem";
 import DateFnsUtils from "@date-io/date-fns";
+import Input from "@material-ui/core/Input";
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
@@ -28,16 +29,9 @@ const hardcodedData = {
     {
       section: "section1",
       valores: [
-        ["Caixa", 23.2, 19.5, "Contas a pagar", 29.2, 26.5],
-        [
-          "Contas a receber",
-          18.5,
-          13.2,
-          "Títulos a pagar/Dívidas de curto prazo",
-          5.5,
-          3.2,
-        ],
-        ["Estoques", 15.3, 14.3, "", "", ""],
+        ["Caixa", "Contas a pagar"],
+        ["Contas a receber","Títulos a pagar/Dívidas de curto prazo"],
+        ["Estoques"],
       ],
     },
     {
@@ -45,11 +39,7 @@ const hardcodedData = {
       valores: [
         [
           "Propriedades, instalações e equipamentos líquidos",
-          113.1,
-          80.9,
           "Dívidas de longo prazo",
-          113.2,
-          78.0,
         ],
       ],
     },
@@ -79,24 +69,45 @@ export default function SpanningTable() {
   const units = ["centenas", "milhares", "milhões", "bilhões", "trilhões"];
   const [unit, setUnit] = useState("milhões");
 
-  const [initialYear, setInitialYear] = useState(new Date().getFullYear());
-  const [finalYear, setFinalYear] = useState(new Date().getFullYear() - 1);
+  const [initialYear, setInitialYear] = useState(new Date().getFullYear() - 1);
+  const [finalYear, setFinalYear] = useState(new Date().getFullYear());
 
-  const [years, setYears] = useState([2021, 2020]);
+  const [years, setYears] = useState([2020, 2021]);
+
+  const [yearsData, setYearsData] = useState({
+    2020:{},
+    2021:{}
+  });
+  
+  let fillValues = () => {
+    let yearlyData = {};
+    for (let i = 0; i < hardcodedData.linhas.length; i++) {
+      for (let j = 0; j < hardcodedData.linhas[i].valores.length; j++) {
+        for (let k = 0; k < hardcodedData.linhas[i].valores[j].length; k++) {
+          yearlyData[hardcodedData.linhas[i].valores[j][k]] = 0;
+        }      
+      } 
+    }
+    return yearlyData;
+  };
 
   useEffect(() => {
     const newYears = [];
+    let newYearsData = {};
     if (initialYear > finalYear) {
       for (let i = initialYear; i >= finalYear; i--) {
+        newYearsData[i] = fillValues;
         newYears.push(i);
       }
     } else {
       for (let i = initialYear; i <= finalYear; i++) {
+        newYearsData[i] = fillValues;
         newYears.push(i);
       }
     }
     console.log(newYears);
     setYears(newYears);
+    setYearsData(newYearsData);
   }, [initialYear, finalYear]);
 
   return (
@@ -165,10 +176,12 @@ export default function SpanningTable() {
           <MuiPickersUtilsProvider utils={DateFnsUtils}>
             <KeyboardDatePicker
               fullWidth
+              disableToolbar
+              variant="inline"
+              format="yyyy"
               margin="normal"
               id="final-year"
               label="Exercício Final"
-              format="yyyy"
               value={new Date(finalYear + "-01-10")}
               onChange={(year) => setFinalYear(year.getFullYear())}
               KeyboardButtonProps={{
@@ -227,13 +240,24 @@ export default function SpanningTable() {
             {data.linhas[0].valores.map((linha) => (
               <TableRow key={linha}>
                 {linha.map((valor) => (
-                  <TableCellNoBorder
-                    align={isNaN(valor) ? "left" : "right"}
+                  [<TableCellNoBorder
+                    align="left"
                     key={valor}
                   >
                     {valor}
-                  </TableCellNoBorder>
-                ))}
+                  </TableCellNoBorder>,
+                  
+                  years.map((year) => (
+                    <TableCellNoBorder
+                      align="right"
+                      key={valor}
+                    >
+                      <Input
+                        value={yearsData[year][valor]}
+                        />
+                    </TableCellNoBorder>
+                  ))]
+                ))}  
               </TableRow>
             ))}
             <TableRow>
@@ -269,12 +293,23 @@ export default function SpanningTable() {
             {data.linhas[1].valores.map((linha) => (
               <TableRow key={linha}>
                 {linha.map((valor) => (
-                  <TableCellNoBorder
-                    align={isNaN(valor) ? "left" : "right"}
+                  [<TableCellNoBorder
+                    align="left"
                     key={valor}
                   >
                     {valor}
-                  </TableCellNoBorder>
+                  </TableCellNoBorder>,
+                  
+                  years.map((year) => (
+                    <TableCellNoBorder
+                      align="right"
+                      key={valor}
+                    >
+                      <Input
+                        value={yearsData[year][valor]}
+                        />
+                    </TableCellNoBorder>
+                  ))]
                 ))}
               </TableRow>
             ))}
