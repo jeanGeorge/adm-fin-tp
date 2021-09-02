@@ -30,7 +30,7 @@ const hardcodedData = {
       section: "section1",
       valores: [
         ["Caixa", "Contas a pagar"],
-        ["Contas a receber","Títulos a pagar/Dívidas de curto prazo"],
+        ["Contas a receber", "Títulos a pagar/Dívidas de curto prazo"],
         ["Estoques"],
       ],
     },
@@ -75,28 +75,27 @@ export default function SpanningTable() {
   const [years, setYears] = useState([2020, 2021]);
 
   const [yearsData, setYearsData] = useState({
-    2020:{},
-    2021:{}
+    2020: {},
+    2021: {},
   });
 
   // TOTAIS
   /* eslint-disable */
-  const [totalAtivoCirculante, setTotalAtivoCirculante] = useState(0)
-  const [totalPassivoCirculante, setTotalPassivoCirculante] = useState(0)
-  const [totalAtivosRealizavelLP, setTotalAtivosRealizavelLP] = useState(0)
-  const [ativosTotais, setAtivosTotais] = useState(0)
-  const [passivosTotais, setPassivosTotais] = useState(0)
-  const [patrimonioLiquido, setPatrimonioLiquido] = useState(0)
+  const [totalAtivoCirculante, setTotalAtivoCirculante] = useState(0);
+  const [totalPassivoCirculante, setTotalPassivoCirculante] = useState(0);
+  const [totalAtivosRealizavelLP, setTotalAtivosRealizavelLP] = useState(0);
+  const [ativosTotais, setAtivosTotais] = useState(0);
+  const [passivosTotais, setPassivosTotais] = useState(0);
+  const [patrimonioLiquido, setPatrimonioLiquido] = useState(0);
 
-  
   let fillValues = () => {
     let yearlyData = {};
     for (let i = 0; i < hardcodedData.linhas.length; i++) {
       for (let j = 0; j < hardcodedData.linhas[i].valores.length; j++) {
         for (let k = 0; k < hardcodedData.linhas[i].valores[j].length; k++) {
           yearlyData[hardcodedData.linhas[i].valores[j][k]] = 0;
-        }      
-      } 
+        }
+      }
     }
     return yearlyData;
   };
@@ -203,8 +202,6 @@ export default function SpanningTable() {
       </Grid>
       <br></br>
 
-      
-
       <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="spanning table">
           <TableHead>
@@ -252,25 +249,17 @@ export default function SpanningTable() {
             </TableRow>
             {data.linhas[0].valores.map((linha) => (
               <TableRow key={linha}>
-                {linha.map((valor) => (
-                  [<TableCellNoBorder
-                    align="left"
-                    key={valor}
-                  >
+                {linha.map((valor) => [
+                  <TableCellNoBorder align="left" key={valor}>
                     {valor}
                   </TableCellNoBorder>,
-                  
+
                   years.map((year) => (
-                    <TableCellNoBorder
-                      align="right"
-                      key={valor}
-                    >
-                      <Input
-                        value={yearsData[year][valor]}
-                        />
+                    <TableCellNoBorder align="right" key={valor}>
+                      <Input value={yearsData[year][valor]} type="number" />
                     </TableCellNoBorder>
-                  ))]
-                ))}  
+                  )),
+                ])}
               </TableRow>
             ))}
             <TableRow>
@@ -281,7 +270,7 @@ export default function SpanningTable() {
                   key={`total-ativo-circulante-${exercicio}`}
                   align="right"
                 >
-                 {totalAtivoCirculante}
+                  {totalAtivoCirculante}
                 </TableCellNoBorder>
               ))}
               <TableCellNoBorder>Total passivo circulante</TableCellNoBorder>
@@ -305,25 +294,17 @@ export default function SpanningTable() {
             </TableRow>
             {data.linhas[1].valores.map((linha) => (
               <TableRow key={linha}>
-                {linha.map((valor) => (
-                  [<TableCellNoBorder
-                    align="left"
-                    key={valor}
-                  >
+                {linha.map((valor) => [
+                  <TableCellNoBorder align="left" key={valor}>
                     {valor}
                   </TableCellNoBorder>,
-                  
+
                   years.map((year) => (
-                    <TableCellNoBorder
-                      align="right"
-                      key={valor}
-                    >
-                      <Input
-                        value={yearsData[year][valor]}
-                        />
+                    <TableCellNoBorder align="right" key={valor}>
+                      <Input value={yearsData[year][valor]} type="number" />
                     </TableCellNoBorder>
-                  ))]
-                ))}
+                  )),
+                ])}
               </TableRow>
             ))}
             {/* TODO: CALCULAR TOTAIS DOS ATIVOS REALIZAVEIS A LP*/}
