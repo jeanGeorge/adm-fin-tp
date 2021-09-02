@@ -78,6 +78,16 @@ export default function SpanningTable() {
     2020:{},
     2021:{}
   });
+
+  // TOTAIS
+  /* eslint-disable */
+  const [totalAtivoCirculante, setTotalAtivoCirculante] = useState(0)
+  const [totalPassivoCirculante, setTotalPassivoCirculante] = useState(0)
+  const [totalAtivosRealizavelLP, setTotalAtivosRealizavelLP] = useState(0)
+  const [ativosTotais, setAtivosTotais] = useState(0)
+  const [passivosTotais, setPassivosTotais] = useState(0)
+  const [patrimonioLiquido, setPatrimonioLiquido] = useState(0)
+
   
   let fillValues = () => {
     let yearlyData = {};
@@ -192,6 +202,9 @@ export default function SpanningTable() {
         </Grid>
       </Grid>
       <br></br>
+
+      
+
       <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="spanning table">
           <TableHead>
@@ -268,7 +281,7 @@ export default function SpanningTable() {
                   key={`total-ativo-circulante-${exercicio}`}
                   align="right"
                 >
-                  0
+                 {totalAtivoCirculante}
                 </TableCellNoBorder>
               ))}
               <TableCellNoBorder>Total passivo circulante</TableCellNoBorder>
@@ -278,7 +291,7 @@ export default function SpanningTable() {
                   key={`total-passivo-circulante-${exercicio}`}
                   align="right"
                 >
-                  0
+                  {totalPassivoCirculante}
                 </TableCellNoBorder>
               ))}
             </TableRow>
@@ -322,7 +335,7 @@ export default function SpanningTable() {
                 key={`total-ativo-realizavel-lp-${exercicio}`}
                 align="right"
               >
-                0
+                {totalAtivosRealizavelLP}
               </TableCellNoBorder>
             ))}
             <TableCellNoBorder>
@@ -354,7 +367,7 @@ export default function SpanningTable() {
                   key={`ativos-vazios-${exercicio}`}
                   align="right"
                 >
-                  <b>0</b>
+                  <b>{passivosTotais}</b>
                 </TableCellNoBorder>
               ))}
             </TableRow>
@@ -386,7 +399,7 @@ export default function SpanningTable() {
               </TableCell>
               {years.map((exercicio) => (
                 <TableCell key={`ativos-totais-${exercicio}`} align="right">
-                  <b>0</b>
+                  <b>{ativosTotais}</b>
                 </TableCell>
               ))}
               <TableCell>
@@ -394,7 +407,7 @@ export default function SpanningTable() {
               </TableCell>
               {years.map((exercicio) => (
                 <TableCell key={`ativos-totais-${exercicio}`} align="right">
-                  <b>0</b>
+                  <b>{passivosTotais + patrimonioLiquido}</b>
                 </TableCell>
               ))}
             </TableRow>
