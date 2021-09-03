@@ -5,12 +5,12 @@ export default function Inicio() {
   return (
     <>
       <Grid container spacing={2} style={{ marginTop: "10px" }}>
-        <Grid item xs={12} md={12} justify="space-between">
-          <Typography variant="h6" component="h6" gutterBottom align="justify">
-            O presente trabalho foi desenvolvido pelos alunos:{" "}
+        <Grid item xs={12} md={12} justify="space-between" style={{maxWidth: "500px"}}>
+          <Typography variant="h6" component="h6" gutterBottom align="justify"><br/>
+            O presente trabalho foi desenvolvido pelos alunos:{" "}<br/>
             <a href="https://github.com/resende-gabriel">Gabriel Resende</a>{" "}
-            (2018046904), <a href="https://github.com/icarovie">Ícaro Vieira</a>{" "}
-            (2018xxxxxx) e{"  "}
+            (2018046904), <br/><a href="https://github.com/icarovie">Ícaro Vieira</a>{" "}
+            (2018046556),<br/>{"  "}
             <a href="https://github.com/jeanGeorge/">Jean George</a>{" "}
             (2018047021){" "}
           </Typography>
