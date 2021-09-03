@@ -29,19 +29,35 @@ const hardcodedData = {
     {
       section: "section1",
       valores: [
-        ["Caixa", "Contas a pagar"],
-        ["Contas a receber", "Títulos a pagar/Dívidas de curto prazo"],
-        ["Estoques"],
+        [
+          { label: "Caixa", tipo: "ativo_circulante" },
+          { label: "Contas a pagar", tipo: "passivo_circulante" },
+        ],
+        [
+          { label: "Contas a receber", tipo: "ativo_circulante" },
+          {
+            label: "Títulos a pagar/Dívidas de curto prazo",
+            tipo: "passivo_circulante",
+          },
+        ],
+        [{ label: "Estoques", tipo: "ativo_circulante" }],
       ],
     },
     {
       section: "section2",
       valores: [
         [
-          "Propriedades, instalações e equipamentos líquidos",
-          "Dívidas de longo prazo",
+          {
+            label: "Propriedades, instalações e equipamentos líquidos",
+            tipo: "ativo_realizavel_lp",
+          },
+          { label: "Dívidas de longo prazo", tipo: "exigivel_lp" },
         ],
       ],
+    },
+    {
+      section: "section3",
+      valores: [[{ label: "Patrimônio Líquido", tipo: "patrimonio_liquido" }]],
     },
   ],
 };
@@ -86,7 +102,62 @@ export default function SpanningTable() {
   const [totalAtivosRealizavelLP, setTotalAtivosRealizavelLP] = useState(0);
   const [ativosTotais, setAtivosTotais] = useState(0);
   const [passivosTotais, setPassivosTotais] = useState(0);
-  const [patrimonioLiquido, setPatrimonioLiquido] = useState(0);
+  const [patrimonioLiquido] = useState(0);
+
+  const updatePassivosTotaisPL = (year) => {
+    const passivos_totais = parseInt(
+      document.getElementById(`passivos_totais_${year}`).innerText,
+      10
+    );
+    const patrimonio_liquido =
+      parseInt(
+        document.getElementById(`patrimonio_liquido_${year}`).value,
+        10
+      ) || 0;
+    const total = passivos_totais + patrimonio_liquido;
+    document.getElementById(`passivos_totais_PL_${year}`).innerText = total;
+    document.getElementById(`passivos_totais_PL_${year}`).value = total;
+  };
+
+  const updateField = (fieldType, year) => {
+    var total = 0;
+    for (let i = 0; i < hardcodedData.linhas.length; i++) {
+      for (let j = 0; j < hardcodedData.linhas[i].valores.length; j++) {
+        for (let k = 0; k < hardcodedData.linhas[i].valores[j].length; k++) {
+          if (hardcodedData.linhas[i].valores[j][k].tipo == fieldType) {
+            total += parseInt(
+              document.getElementById(
+                `${hardcodedData.linhas[i].valores[j][k].label}_${year}`
+              ).value || 0
+            );
+          }
+        }
+      }
+    }
+    document.getElementById(`${fieldType}_${year}`).value = total;
+    document.getElementById(`${fieldType}_${year}`).innerText = total;
+    if (fieldType == "exigivel_lp" || fieldType == "passivo_circulante") {
+      const total =
+        parseInt(document.getElementById(`exigivel_lp_${year}`).innerText, 10) +
+        parseInt(
+          document.getElementById(`passivo_circulante_${year}`).innerText,
+          10
+        );
+      document.getElementById(`passivos_totais_${year}`).innerText = total;
+      updatePassivosTotaisPL(year);
+    } else {
+      const total =
+        parseInt(
+          document.getElementById(`ativo_circulante_${year}`).innerText,
+          10
+        ) +
+        parseInt(
+          document.getElementById(`ativo_realizavel_lp_${year}`).innerText,
+          10
+        );
+      document.getElementById(`ativos_totais_${year}`).innerText = total;
+    }
+  };
 
   let fillValues = () => {
     let yearlyData = {};
@@ -114,7 +185,6 @@ export default function SpanningTable() {
         newYears.push(i);
       }
     }
-    console.log(newYears);
     setYears(newYears);
     setYearsData(newYearsData);
   }, [initialYear, finalYear]);
@@ -250,13 +320,18 @@ export default function SpanningTable() {
             {data.linhas[0].valores.map((linha) => (
               <TableRow key={linha}>
                 {linha.map((valor) => [
-                  <TableCellNoBorder align="left" key={valor}>
-                    {valor}
+                  <TableCellNoBorder align="left" key={valor.label}>
+                    {valor.label}
                   </TableCellNoBorder>,
 
                   years.map((year) => (
-                    <TableCellNoBorder align="right" key={valor}>
-                      <Input value={yearsData[year][valor]} type="number" />
+                    <TableCellNoBorder align="right" key={valor.label}>
+                      <Input
+                        id={`${valor.label}_${year}`}
+                        value={yearsData[year][valor.label]}
+                        type="number"
+                        onChange={(e) => updateField(valor.tipo, year)}
+                      />
                     </TableCellNoBorder>
                   )),
                 ])}
@@ -267,7 +342,8 @@ export default function SpanningTable() {
               {/* TODO: CALCULAR TOTAIS DO ATIVO CIRCULANTE */}
               {years.map((exercicio) => (
                 <TableCellNoBorder
-                  key={`total-ativo-circulante-${exercicio}`}
+                  id={`ativo_circulante_${exercicio}`}
+                  key={`ativo_circulante_${exercicio}`}
                   align="right"
                 >
                   {totalAtivoCirculante}
@@ -277,7 +353,8 @@ export default function SpanningTable() {
               {/* TODO: CALCULAR TOTAIS DO PASSIVO CIRCULANTE */}
               {years.map((exercicio) => (
                 <TableCellNoBorder
-                  key={`total-passivo-circulante-${exercicio}`}
+                  id={`passivo_circulante_${exercicio}`}
+                  key={`passivo_circulante_${exercicio}`}
                   align="right"
                 >
                   {totalPassivoCirculante}
@@ -295,13 +372,17 @@ export default function SpanningTable() {
             {data.linhas[1].valores.map((linha) => (
               <TableRow key={linha}>
                 {linha.map((valor) => [
-                  <TableCellNoBorder align="left" key={valor}>
-                    {valor}
+                  <TableCellNoBorder align="left" key={valor.label}>
+                    {valor.label}
                   </TableCellNoBorder>,
-
                   years.map((year) => (
-                    <TableCellNoBorder align="right" key={valor}>
-                      <Input value={yearsData[year][valor]} type="number" />
+                    <TableCellNoBorder align="right" key={valor.label}>
+                      <Input
+                        id={`${valor.label}_${year}`}
+                        value={yearsData[year][valor.label]}
+                        type="number"
+                        onChange={(e) => updateField(valor.tipo, year)}
+                      />
                     </TableCellNoBorder>
                   )),
                 ])}
@@ -313,7 +394,8 @@ export default function SpanningTable() {
             </TableCellNoBorder>
             {years.map((exercicio) => (
               <TableCellNoBorder
-                key={`total-ativo-realizavel-lp-${exercicio}`}
+                id={`ativo_realizavel_lp_${exercicio}`}
+                key={`ativo_realizavel_lp_${exercicio}`}
                 align="right"
               >
                 {totalAtivosRealizavelLP}
@@ -325,7 +407,8 @@ export default function SpanningTable() {
             {/* TODO: CALCULAR TOTAIS DE EXIGÍVEIS A LP */}
             {years.map((exercicio) => (
               <TableCellNoBorder
-                key={`total-exigiveis-lp-${exercicio}`}
+                id={`exigivel_lp_${exercicio}`}
+                key={`exigivel_lp_${exercicio}`}
                 align="right"
               >
                 0
@@ -345,7 +428,8 @@ export default function SpanningTable() {
               {/* TODO: CALCULAR PASSIVOS TOTAIS */}
               {years.map((exercicio) => (
                 <TableCellNoBorder
-                  key={`ativos-vazios-${exercicio}`}
+                  id={`passivos_totais_${exercicio}`}
+                  key={`passivos_totais_${exercicio}`}
                   align="right"
                 >
                   <b>{passivosTotais}</b>
@@ -366,10 +450,17 @@ export default function SpanningTable() {
               {/* TODO: CALCULAR PATRIMONIO LIQUIDO */}
               {years.map((exercicio) => (
                 <TableCell
-                  key={`patrimonio-liquido-${exercicio}`}
+                  key={`patrimonio_liquido_${exercicio}`}
                   align="right"
                 >
-                  <b>0</b>
+                  <Input
+                    id={`patrimonio_liquido_${exercicio}`}
+                    value={yearsData[exercicio]["patrimonio_liquido"]}
+                    type="number"
+                    onChange={(e) => {
+                      updatePassivosTotaisPL(exercicio);
+                    }}
+                  />
                 </TableCell>
               ))}
             </TableRow>
@@ -379,7 +470,11 @@ export default function SpanningTable() {
                 <b>Ativos totais</b>
               </TableCell>
               {years.map((exercicio) => (
-                <TableCell key={`ativos-totais-${exercicio}`} align="right">
+                <TableCell
+                  key={`ativos_totais_${exercicio}`}
+                  id={`ativos_totais_${exercicio}`}
+                  align="right"
+                >
                   <b>{ativosTotais}</b>
                 </TableCell>
               ))}
@@ -387,8 +482,12 @@ export default function SpanningTable() {
                 <b>Passivos totais e patrimônio líquido</b>
               </TableCell>
               {years.map((exercicio) => (
-                <TableCell key={`ativos-totais-${exercicio}`} align="right">
-                  <b>{passivosTotais + patrimonioLiquido}</b>
+                <TableCell
+                  key={`passivos_totais_PL_${exercicio}`}
+                  id={`passivos_totais_PL_${exercicio}`}
+                  align="right"
+                >
+                  <b>0</b>
                 </TableCell>
               ))}
             </TableRow>
